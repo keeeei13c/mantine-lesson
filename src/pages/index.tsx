@@ -1,13 +1,21 @@
 import type { NextPage } from 'next'
-
+import { useEffect } from 'react'
+import { supabase } from 'src/utils/supabase'
+import useStore from 'src/store'
+import { Auth } from 'src/components/Auth'
+import { DashBoard } from 'src/components/DashBoard'
 
 const Home: NextPage = () => {
-  return (
-    <div>
-      <h1>hello world</h1>
-      <div>foo</div>
-    </div>
-  )
+  const session = useStore((state) => state.session)
+  const setSession = useStore((state) => state.setSession)
+
+  useEffect(() => {
+    setSession(supabase.auth.session())
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [setSession])
+  return <>{session ? <DashBoard /> : <Auth />}</>
 }
 
 export default Home
